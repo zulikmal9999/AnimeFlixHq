@@ -3,6 +3,8 @@ import Search from "../Component/Search";
 import AnimeCard from "../Component/AnimeCard";
 import { fetchAnime } from "../api's/animeApi";
 import { useDebounce } from "react-use";
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
 
 const Home = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -17,7 +19,7 @@ const Home = () => {
   });
   const itemsPerPage = 12;
 
-  const fetchMovies = useCallback(async (query = '', page = 1) => {
+  const fetchAnimes = useCallback(async (query = '', page = 1) => {
     setIsLoading(true);
     setErrorMessage('');
     try {
@@ -26,7 +28,7 @@ const Home = () => {
       setPagination(result.pagination);
       setCurrentPage(page);
     } catch (error) {
-      setErrorMessage(error.message || "Failed to fetch movies");
+      setErrorMessage(error.message || "Failed to fetch animes");
     } finally {
       setIsLoading(false);
     }
@@ -34,16 +36,16 @@ const Home = () => {
 
   useDebounce(() => {
     if (searchTerm) {
-      fetchMovies(searchTerm, 1); // Reset to first page on new search
+      fetchAnimes(searchTerm, 1); // Reset to first page on new search
     }
   }, 250, [searchTerm]); // 250ms debounce as per requirements
 
   useEffect(() => {
-    fetchMovies('', 1);
-  }, [fetchMovies]);
+    fetchAnimes('', 1);
+  }, [fetchAnimes]);
 
   const paginate = (pageNumber) => {
-    fetchMovies(searchTerm, pageNumber); // Fetch new page data from server
+    fetchAnimes(searchTerm, pageNumber); // Fetch new page data from server
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -59,19 +61,22 @@ const Home = () => {
           <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
         </header>
 
-        <section className="all-movies">
-          <h2>All Animes</h2>
+        <section className="all-animes">
+          <h2>List of Animes</h2>
           {isLoading ? (
-            <p className="text-white">Loading...</p>
+            <Box sx={{ display: 'flex' }}>
+              <CircularProgress />
+            </Box>
           ) : errorMessage ? (
             <p className="text-red-500">{errorMessage}</p>
           ) : (
             <>
-              <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <ul className="flex flex-wrap justify-center">
                 {movieList.map((anime) => (
                   <AnimeCard key={anime.mal_id} anime={anime} />
                 ))}
               </ul>
+               {/* Pagination */}
               {pagination.last_visible_page > 1 && (
                 <div className="pagination mt-8 flex justify-center items-center gap-2">
                   <button
