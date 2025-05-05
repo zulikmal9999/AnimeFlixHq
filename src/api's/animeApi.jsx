@@ -1,4 +1,5 @@
-const API_BASE_URL = "https://api.jikan.moe/v4/anime";
+const API_BASE_URL = "/api/anime"; // Vite dev proxy rewrites this to https://api.jikan.moe/v4/anime
+
 const API_OPTIONS = {
   method: "GET",
   headers: {
@@ -7,8 +8,9 @@ const API_OPTIONS = {
   },
 };
 
+// Throttling to avoid rate limits (~3 requests/sec)
 let lastRequestTime = 0;
-const THROTTLE_DELAY = 350; // ~3 requests/sec
+const THROTTLE_DELAY = 350;
 
 const throttleRequest = async () => {
   const now = Date.now();
@@ -38,46 +40,49 @@ const fetchFromAPI = async (url, params = "") => {
 
     const data = await response.json();
 
-    if (!data) {
+    if (!data || !data.data) {
       throw new Error("Invalid data structure from API");
     }
 
     return data;
   } catch (error) {
+    console.error("API Fetch Error:", error.message);
     throw new Error(error.message || "Failed to fetch data");
   }
 };
 
 export const fetchAnime = async (query = "", page = 1, limit = 9) => {
   const searchParams = new URLSearchParams();
-  
+
   if (query.trim()) {
-    searchParams.append('q', query);
+    searchParams.append("q", query);
   }
-  
-  searchParams.append('page', page);
-  searchParams.append('limit', limit);
-  
-  const result = await fetchFromAPI(API_BASE_URL, `?${searchParams.toString()}`);
-  
+
+  searchParams.append("page", page);
+  searchParams.append("limit", limit);
+
+  const result = await fetchFromAPI(`${API_BASE_URL}`, `?${searchParams.toString()}`);
+
   return {
     data: result.data || [],
     pagination: result.pagination || {
       last_visible_page: 1,
       has_next_page: false,
-      current_page: page
-    }
+      current_page: page,
+    },
   };
 };
 
 export const fetchAnimeMoreInfo = async (id) => {
   if (!id) throw new Error("Anime ID is required");
-  
+
   try {
     const result = await fetchFromAPI(`${API_BASE_URL}/${id}/full`);
     return result.data;
   } catch (error) {
-    console.error("Error fetching anime more info:", error);
-    return { synopsis: "No additional information available." };
+    console.error("Error fetching anime more info:", error.message);
+    return {
+      synopsis: "No additional information available.",
+    };
   }
 };
