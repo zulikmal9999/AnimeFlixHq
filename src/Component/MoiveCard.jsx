@@ -1,38 +1,61 @@
+
 import React from "react";
 import { Link } from "react-router-dom";
+import {
+  Card,
+  CardMedia,
+  CardContent,
+  Typography,
+  Box,
+} from "@mui/material";
+import StarIcon from '@mui/icons-material/Star';
 
-const MovieCard = ({ movie }) => {
-  // Use the image directly from the movie object
-  // Jikan API provides images in the movie.images object
-  const imageUrl = movie?.images?.jpg?.image_url || "/no-movie.png";
-  const title = movie?.title || "Unknown Title";
-  const score = movie?.score;
+const MovieCard = ({ anime }) => {
+  const imageUrl = anime?.images?.jpg?.image_url || "/no-anime.png";
+  const title = anime?.title || "Unknown Title";
+  const score = anime?.score;
 
   return (
-    <Link to={`/anime/${movie.mal_id}`}>
-    <div className="movie-card">
-      <img
-        src={imageUrl}
-        alt={`Poster for ${title}`}
-        className="movie-poster"
-        onError={(e) => {
-          e.target.onerror = null;
-          e.target.src = "/no-movie.png";
+    <Link to={`/anime/${anime.mal_id}`} style={{ textDecoration: 'none' }}>
+      <Card
+        sx={{
+          width: 225,
+          textAlign: "center",
+          borderRadius: 2,
+          overflow: "hidden",
+          boxShadow: 3,
+          "&:hover": { boxShadow: 6 },
         }}
-      />
-      <div className="mt-4"><h3>{title}</h3></div>
-      <div className="content">
-        <div className="rating">
-            <img src="star.svg" alt="Star Icon"></img>
-         <p>{score ? score.toFixed(1): 'N/A'}</p>
-
-        </div>
-        <span>•</span>
-
-      </div>
-    </div>
+      >
+        <CardMedia
+          component="img"
+          height="340"
+          image={imageUrl}
+          alt={`Poster for ${title}`}
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = "/no-anime.png";
+          }}
+        />
+        <CardContent>
+          <Typography variant="subtitle1" fontWeight="bold" noWrap>
+            {title}
+          </Typography>
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            mt={1}
+            gap={0.5}
+          >
+            <StarIcon sx={{ color: "#FFD700", fontSize: 18 }} />
+            <Typography variant="body2">
+              {score ? score.toFixed(1) : "N/A"}
+            </Typography>
+          </Box>
+        </CardContent>
+      </Card>
     </Link>
-    
   );
 };
 

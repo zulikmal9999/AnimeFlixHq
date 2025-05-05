@@ -10,14 +10,21 @@ const Home = () => {
   const [movieList, setMovieList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState({
+    last_visible_page: 1,
+    has_next_page: false,
+    current_page: 1
+  });
   const itemsPerPage = 9;
 
-  const fetchMovies = useCallback(async (query = '') => {
+  const fetchMovies = useCallback(async (query = '', page = 1) => {
     setIsLoading(true);
     setErrorMessage('');
     try {
-      const data = await fetchAnime(query);
-      setMovieList(data);
+      const result = await fetchAnime(query, page, itemsPerPage);
+      setMovieList(result.data);
+      setPagination(result.pagination);
+      setCurrentPage(page);
     } catch (error) {
       setErrorMessage(error.message || "Failed to fetch movies");
     } finally {
@@ -27,25 +34,18 @@ const Home = () => {
 
   useDebounce(() => {
     if (searchTerm) {
-      fetchMovies(searchTerm, 1);
+      fetchMovies(searchTerm, 1); // Reset to first page on new search
     }
-  }, 500, [searchTerm]);
+  }, 250, [searchTerm]); // 250ms debounce as per requirements
 
   useEffect(() => {
     fetchMovies('', 1);
   }, [fetchMovies]);
 
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = movieList.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(movieList.length / itemsPerPage);
-
   const paginate = (pageNumber) => {
-    setCurrentPage(pageNumber);
-    fetchMovies(searchTerm, pageNumber); // Fetch new page data
+    fetchMovies(searchTerm, pageNumber); // Fetch new page data from server
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-
 
   return (
     <main>
@@ -54,13 +54,13 @@ const Home = () => {
       </div>
       <div className="wrapper">
         <header>
-          <img src="./bakugou.png" alt="Hero Banner" />
-          <h1>Find<span className="text-gradient"> Movies</span> You will enjoy</h1>
+          {/* <img src="./bakugou.png" alt="Hero Banner" /> */}
+          <h1>Find<span className="text-gradient"> Animes</span> You will enjoy</h1>
           <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
         </header>
 
         <section className="all-movies">
-          <h2>All Movies</h2>
+          <h2>All Animes</h2>
           {isLoading ? (
             <p className="text-white">Loading...</p>
           ) : errorMessage ? (
@@ -68,20 +68,37 @@ const Home = () => {
           ) : (
             <>
               <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {currentItems.map((movie) => (
-                  <MoiveCard key={movie.mal_id} movie={movie} />
+                {movieList.map((anime) => (
+                  <MoiveCard key={anime.mal_id} anime={anime} />
                 ))}
               </ul>
-              {totalPages > 1 && (
+              {pagination.last_visible_page > 1 && (
                 <div className="pagination mt-8 flex justify-center items-center gap-2">
                   <button
                     onClick={() => paginate(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className="px-4 py-2 bg-gray-200 text-gray-800 rounded disabled+ disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 bg-gray-200 text-gray-800 rounded disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Previous
                   </button>
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  {/* Show limited page buttons for better UX */}
+                  {Array.from(
+                    { length: Math.min(5, pagination.last_visible_page) }, 
+                    (_, i) => {
+                      // Calculate the page numbers to show based on current page
+                      const totalPages = pagination.last_visible_page;
+                      let startPage = Math.max(1, currentPage - 2);
+                      let endPage = Math.min(totalPages, startPage + 4);
+                      
+                      if (endPage - startPage < 4) {
+                        startPage = Math.max(1, endPage - 4);
+                      }
+                      
+                      return startPage + i;
+                    }
+                  )
+                  .filter(page => page <= pagination.last_visible_page)
+                  .map((page) => (
                     <button
                       key={page}
                       onClick={() => paginate(page)}
@@ -96,7 +113,7 @@ const Home = () => {
                   ))}
                   <button
                     onClick={() => paginate(currentPage + 1)}
-                    disabled={currentPage === totalPages}
+                    disabled={!pagination.has_next_page}
                     className="px-4 py-2 bg-gray-200 text-gray-800 rounded disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Next
