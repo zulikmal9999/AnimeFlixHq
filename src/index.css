@@ -93,7 +93,7 @@
     }
   }
 
-  .all-movies {
+  .all-animes {
     @apply space-y-9;
 
     & ul {
