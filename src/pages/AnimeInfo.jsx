@@ -171,8 +171,8 @@ const AnimeInfo = () => {
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Paper elevation={3} sx={{ p: 3, bgcolor: "#f8f9fa" }}>
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-          <Typography variant="h4" component="h1">
-            Anime Details
+          <Typography variant="h4" component="h1" sx={{ color: '#4b3f72' }}>
+           <span className="text-gradient"> Anime Details</span>
           </Typography>
           <Button 
             variant="contained" 
@@ -183,9 +183,9 @@ const AnimeInfo = () => {
           </Button>
         </Box>
 
-        <Grid container spacing={4}>
+        <Grid container spacing={2}>
           {/* Left column - Image and quick stats */}
-          <Grid item xs={12} md={4}>
+          <Grid item size={4}>
             <Card elevation={2}>
               {imageUrl && !imageError ? (
                 <CardMedia
@@ -216,11 +216,8 @@ const AnimeInfo = () => {
               )}
 
               <CardContent>
-                <Typography variant="h5" component="h2" gutterBottom>
-                  {title}
-                </Typography>
                 
-                <Box mt={2}>
+                <Box mt={0}>
                   <StatItem 
                     icon={<Star color="warning" />} 
                     label="Score" 
@@ -270,7 +267,7 @@ const AnimeInfo = () => {
           </Grid>
 
           {/* Right column - Details */}
-          <Grid item xs={12} md={8}>
+          <Grid item size={8}>
             <Card elevation={2} sx={{ height: "100%" }}>
               <CardContent>
                 <InfoField 
