@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import StarIcon from '@mui/icons-material/Star';
 
-const MovieCard = ({ anime }) => {
+const AnimeCard = ({ anime }) => {
   const imageUrl = anime?.images?.jpg?.image_url || "/no-anime.png";
   const title = anime?.title || "Unknown Title";
   const score = anime?.score;
@@ -59,4 +59,4 @@ const MovieCard = ({ anime }) => {
   );
 };
 
-export default MovieCard;
+export default AnimeCard;

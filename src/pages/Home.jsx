@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import Search from "../Component/Search";
-import MoiveCard from "../Component/MoiveCard";
+import AnimeCard from "../Component/AnimeCard";
 import { fetchAnime } from "../api's/animeApi";
 import { useDebounce } from "react-use";
 
@@ -15,7 +15,7 @@ const Home = () => {
     has_next_page: false,
     current_page: 1
   });
-  const itemsPerPage = 9;
+  const itemsPerPage = 12;
 
   const fetchMovies = useCallback(async (query = '', page = 1) => {
     setIsLoading(true);
@@ -69,7 +69,7 @@ const Home = () => {
             <>
               <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {movieList.map((anime) => (
-                  <MoiveCard key={anime.mal_id} anime={anime} />
+                  <AnimeCard key={anime.mal_id} anime={anime} />
                 ))}
               </ul>
               {pagination.last_visible_page > 1 && (
