@@ -6,6 +6,7 @@ import { useDebounce } from "react-use";
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 import NotFound from "../pages/NotFound";
+import Alert from '@mui/material/Alert';
 
 const Home = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -70,7 +71,11 @@ const Home = () => {
             </Box>
           ) : errorMessage ? (
             <p className="text-red-500">{errorMessage}</p>
-          ) : (
+          ) : animeList.length === 0 && searchTerm ?(
+            <Alert severity="info" sx={{ mt: 2 }}>
+              No results found for "{searchTerm}". Try a different search.
+            </Alert>
+        ) : (
             <>
               <ul className="flex flex-wrap justify-center">
                 {animeList.map((anime) => (
