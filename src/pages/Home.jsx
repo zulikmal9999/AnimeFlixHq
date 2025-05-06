@@ -5,11 +5,12 @@ import { fetchAnime } from "../api's/animeApi";
 import { useDebounce } from "react-use";
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
+import NotFound from "../pages/NotFound";
 
 const Home = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const [movieList, setMovieList] = useState([]);
+  const [animeList, setAnimeList] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState({
@@ -24,7 +25,7 @@ const Home = () => {
     setErrorMessage('');
     try {
       const result = await fetchAnime(query, page, itemsPerPage);
-      setMovieList(result.data);
+      setAnimeList(result.data);
       setPagination(result.pagination);
       setCurrentPage(page);
     } catch (error) {
@@ -72,7 +73,7 @@ const Home = () => {
           ) : (
             <>
               <ul className="flex flex-wrap justify-center">
-                {movieList.map((anime) => (
+                {animeList.map((anime) => (
                   <AnimeCard key={anime.mal_id} anime={anime} />
                 ))}
               </ul>

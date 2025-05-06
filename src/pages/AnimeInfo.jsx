@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { fetchAnimeMoreInfo } from "../api's/animeApi";
+import NotFound from "../pages/NotFound";
 import { 
   Button, 
   Typography, 
